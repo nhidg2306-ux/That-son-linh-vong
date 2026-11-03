@@ -1792,7 +1792,7 @@ html, body, body * { font-family: "Times New Roman", Times, serif !important; }
   <p class="loi-cam-on-thu">Trân trọng cảm ơn!</p>
   <p class="ky-ten"><br><span style="font-size:13px"></span></p>
 
-  <div class="nut-cuoi"><button type="button" onclick="window.print()">LƯU THƯ MỜI</button><button type="button" onclick="hienTimeline()">XEM TIMELINE</button></div>
+  <div class="nut-cuoi"><button type="button" onclick="inThuMoi()">IN / LƯU THƯ MỜI</button><button type="button" onclick="hienTimeline()">XEM TIMELINE</button></div>
 </article>
 </div>
 
@@ -1833,7 +1833,7 @@ html, body, body * { font-family: "Times New Roman", Times, serif !important; }
       <p>VỊ TRÍ KHU D · TRƯỜNG ĐẠI HỌC NAM CẦN THƠ</p>
     </div>
     <div class="sodo-image-wrap">
-      <img class="sodo-image" src="so-do-su-kien.png" alt="Sơ đồ khuôn viên và vị trí tổ chức sự kiện Thất Sơn Linh Vọng tại Khu D">
+      <img class="sodo-image" src="so-do-that-son-linh-vong.png" alt="Sơ đồ khuôn viên và vị trí tổ chức sự kiện Thất Sơn Linh Vọng tại Khu D">
     </div>
     <div class="sodo-actions">
       <button type="button" onclick="dongSoDoMoLoiKet()">KHÉP SƠ ĐỒ</button>
@@ -1919,6 +1919,34 @@ function moThu() {
     if (nut) nut.classList.remove("dang-mo");
   }, 1650);
 }
+function inThuMoi() {
+  const lopThu = document.getElementById("thuMoi");
+  if (!lopThu) return;
+
+  // Bao dam noi dung thu dang duoc hien thi truoc khi mo hop thoai in.
+  lopThu.classList.remove("dang-khai-mo");
+  lopThu.classList.add("hien");
+  document.body.style.overflow = "visible";
+
+  const choTaiXong = async () => {
+    try {
+      if (document.fonts && document.fonts.ready) await document.fonts.ready;
+    } catch (e) {}
+    const anhTrongThu = Array.from(lopThu.querySelectorAll("img"));
+    await Promise.all(anhTrongThu.map(anh => {
+      if (anh.complete) return Promise.resolve();
+      return new Promise(resolve => {
+        anh.addEventListener("load", resolve, { once: true });
+        anh.addEventListener("error", resolve, { once: true });
+      });
+    }));
+    window.requestAnimationFrame(() => window.requestAnimationFrame(() => window.print()));
+  };
+  choTaiXong();
+}
+window.addEventListener("afterprint", () => {
+  document.body.style.overflow = "";
+});
 function dongThu() { document.getElementById("thuMoi").classList.remove("hien"); document.body.style.overflow = ""; }
 document.getElementById("thuMoi").addEventListener("click", function(event) { if (event.target === this) dongThu(); });
 const vungSaoLoiKet = document.getElementById("hatSaoLoiKet");
